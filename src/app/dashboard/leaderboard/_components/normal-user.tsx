@@ -21,7 +21,7 @@ export function NormalPlacementUser({
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className='flex flex-col gap-1 items-start'>
-          <p className='font-semibold'>{username}</p>
+          <p className='font-semibold'>@{username}</p>
           <p className='text-sm flex items-center justify-center gap-1'>
             <Image
               src='http://via.placeholder.com/16x16'

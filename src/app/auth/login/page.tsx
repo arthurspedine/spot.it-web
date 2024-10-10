@@ -6,15 +6,15 @@ export default function LoginPage() {
       <h1 className='text-red-700 text-2xl font-semibold text-center'>
         spot.it
       </h1>
-      <p className='text-sm text-stone-700'>
+      <p className='text-sm text-muted-foreground'>
         Por favor, insira seus dados para entrar.
       </p>
 
       <LoginForm />
 
-      <p className='text-sm text-stone-700'>
+      <p className='text-sm text-muted-foreground'>
         Ainda não tem uma conta?{' '}
-        <span className='font-bold text-black hover: cursor-pointer'>
+        <span className='font-bold text-card-foreground hover: cursor-pointer'>
           Registrar-se
         </span>
       </p>

@@ -39,7 +39,7 @@ export function TopPlacementUser({
         <p className='mr-[1px]'>{placement}</p>
       </div>
       <div className='text-xs text-center mt-3'>
-        <p className='font-bold my-1'>{username}</p>
+        <p className='font-bold my-1'>@{username}</p>
         <p className='flex items-center justify-center gap-1'>
           <Image
             src='http://via.placeholder.com/64x64'
