@@ -62,18 +62,12 @@ export default function Leaderboard() {
     },
   ]
 
-  const top3 = leaderboard.slice(0, 3)
-
-  const orderedTop3 = [top3[1], top3[0], top3[2]]
-
-  const users = leaderboard.slice(3)
-
   return (
-    <main className='flex flex-col flex-grow min-h-screen bg-red-300 mb-[72px]'>
+    <main className='flex flex-col flex-grow min-h-screen bg-background mb-16'>
       <div className='flex flex-col min-h-[40vh] justify-between'>
         <h1 className='text-center font-semibold text-2xl py-5'>Leaderboard</h1>
-        <div className='flex min-h-full justify-center items-end gap-7'>
-          {orderedTop3.map((user, index) => (
+        <div className='flex min-h-full justify-center items-end gap-4'>
+          {leaderboard.slice(0, 3).map((user, index) => (
             <TopPlacementUser
               key={user.username}
               {...user}
@@ -83,8 +77,8 @@ export default function Leaderboard() {
           ))}
         </div>
       </div>
-      <div className='flex flex-col gap-2 w-full bg-stone-100 rounded-t-[30px] py-7 px-5 flex-grow'>
-        {users.map((user, i) => (
+      <div className='flex flex-col gap-2 w-full bg-background rounded-t-3xl py-6 pb-8 px-5 flex-grow'>
+        {leaderboard.slice(3).map((user, i) => (
           <NormalPlacementUser
             key={user.username}
             {...user}

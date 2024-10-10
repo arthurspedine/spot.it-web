@@ -1,4 +1,4 @@
-import { UserMenu } from './leaderboard/_components/user-menu'
+import { UserMenu } from './_components/user-menu'
 
 export default function DashboardLayout({
   children,

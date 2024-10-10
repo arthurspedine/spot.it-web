@@ -10,39 +10,41 @@ export function UserMenu() {
   const pathname = usePathname()
 
   const dashboardPath = '/dashboard'
-  const bgColor = 'bg-red-400'
 
   return (
-    <nav className='fixed bottom-0 w-full bg-white py-3 shadow-[0_-2px_4px_-1px_rgba(0,0,0,0.3)]'>
+    <nav className='fixed bottom-0 w-full bg-background py-3 border-t-2 border-border'>
       <ul className='flex justify-evenly items-center list-none'>
         <li
           className={`p-2.5 rounded-full ${
-            pathname === `${dashboardPath}` ? bgColor : ''
+            pathname === `${dashboardPath}`
+              ? 'bg-primary text-primary-foreground'
+              : 'text-foreground'
           }`}
         >
           <Link href={'/dashboard'}>
-            <HomeOutlinedIcon fontSize='large' sx={{ color: grey[800] }} />
+            <HomeOutlinedIcon fontSize='large' />
           </Link>
         </li>
         <li
           className={`p-2.5 rounded-full ${
-            pathname === `${dashboardPath}/leaderboard` ? bgColor : ''
+            pathname === `${dashboardPath}/leaderboard`
+              ? 'bg-primary text-primary-foreground'
+              : 'text-foreground'
           }`}
         >
           <Link href={'/dashboard/leaderboard'}>
-            <LeaderboardOutlinedIcon
-              fontSize='large'
-              sx={{ color: grey[800] }}
-            />
+            <LeaderboardOutlinedIcon fontSize='large' />
           </Link>
         </li>
         <li
           className={`p-2.5 rounded-full ${
-            pathname === `${dashboardPath}/profile` ? bgColor : ''
+            pathname === `${dashboardPath}/profile`
+              ? 'bg-primary text-primary-foreground'
+              : 'text-foreground'
           }`}
         >
           <Link href={'/dashboard/profile'}>
-            <PersonOutlineIcon fontSize='large' sx={{ color: grey[800] }} />
+            <PersonOutlineIcon fontSize='large' />
           </Link>
         </li>
       </ul>
