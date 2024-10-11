@@ -19,6 +19,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import Image from 'next/image'
+import imageCompression from 'browser-image-compression'
 
 const wallySignUpSchema = z.object({
   name: z
@@ -29,12 +30,6 @@ const wallySignUpSchema = z.object({
     .string()
     .email('Formato de email inválido.')
     .max(100, 'O email deve ter no máximo 100 caracteres.'),
-  profilePicture: z
-    .custom<FileList>(file => file instanceof FileList)
-    .refine(
-      file => file !== null && file.length > 0,
-      'É necessário selecionar uma imagem.'
-    ),
   role: z.string().min(3, 'O cargo deve ter ao menos 3 caracteres.'),
 })
 
@@ -48,16 +43,23 @@ export function WallySignUpForm() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  async function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     if (file) {
-      setSelectedImage(file)
-      setIsDialogOpen(true)
-    }
+      try {
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 300,
+          useWebWorker: true,
+        }
 
-    register('profilePicture').onChange({
-      target: { files: event.target.files },
-    })
+        const compressedFile = await imageCompression(file, options)
+        setSelectedImage(compressedFile)
+        setIsDialogOpen(true)
+      } catch (error) {
+        toast.error('Algo deu errado ao comprimir a imagem.')
+      }
+    }
   }
 
   const handleCancel = () => {
@@ -70,17 +72,21 @@ export function WallySignUpForm() {
   }
 
   async function handleSignUp(data: WallySignUpSchema) {
+    if (!selectedImage) {
+      return toast.error('Nenhuma foto selecionada.')
+    }
+
     const signUpForm = new FormData()
     signUpForm.append('name', data.name)
     signUpForm.append('email', data.email)
-    signUpForm.append('profilePicture', data.profilePicture[0]) // taking the only image from the FileList
+    signUpForm.append('profilePicture', selectedImage) // taking the only image from the FileList
     signUpForm.append('role', data.role)
-    
+
     const signUpRequest = api.post(
       `${clientEnv.NEXT_PUBLIC_BACKEND_URL}/wally/register`,
       signUpForm
     )
-    
+
     toast.promise(signUpRequest, {
       loading: 'Cadastrando wally...',
       success: 'Wally cadastrado com sucesso.',
@@ -137,7 +143,6 @@ export function WallySignUpForm() {
               accept='image/*'
               capture='environment'
               className='absolute inset-0 opacity-0 cursor-pointer'
-              {...register('profilePicture')}
               onChange={handleImageChange}
             />
             {selectedImage ? (
@@ -147,12 +152,6 @@ export function WallySignUpForm() {
             )}
           </div>
         </Button>
-
-        {formState.errors.profilePicture && (
-          <p className='text-destructive'>
-            {formState.errors.profilePicture.message}
-          </p>
-        )}
       </div>
 
       <div className='space-y-1'>
