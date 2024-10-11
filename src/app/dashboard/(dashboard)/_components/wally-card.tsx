@@ -41,9 +41,6 @@ export function WallyCard({ id, name, profilePicture, score }: WallyCardProps) {
   }
 
   const handleSendImage = () => {
-    if (selectedImage) {
-      console.log('Imagem enviada:', selectedImage)
-    }
     setIsDialogOpen(false)
     setSelectedImage(null)
   }
