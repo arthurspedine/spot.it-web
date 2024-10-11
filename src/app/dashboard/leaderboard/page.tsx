@@ -1,89 +1,104 @@
-import type { UserLeaderboard } from '@/types/user-leaderboard'
-import Image from 'next/image'
-import { TopPlacementUser } from './_components/top-user'
-import { NormalPlacementUser } from './_components/normal-user'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Search } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
+import { UserCard } from './_components/user-card'
 
 export default function Leaderboard() {
-  const leaderboard: UserLeaderboard[] = [
+  const leaderboard = [
     {
-      profile_picture: '/example.com/profile1.jpg',
+      id: '1',
+      name: 'Sky Walker',
       username: 'sky_walker92',
+      profilePicture: '/example.com/profile1.jpg',
       score: 98,
     },
     {
-      profile_picture: '/example.com/profile2.jpg',
+      id: '2',
+      name: 'Pixel Ninja',
       username: 'pixelNinja87',
+      profilePicture: '/example.com/profile2.jpg',
       score: 92,
     },
     {
-      profile_picture: '/example.com/profile3.jpg',
+      id: '3',
+      name: 'Astro Coder',
       username: 'astro_coder',
+      profilePicture: '/example.com/profile3.jpg',
       score: 88,
     },
     {
-      profile_picture: '/example.com/profile4.jpg',
+      id: '4',
+      name: 'Quantum Flare',
       username: 'quantumFlare',
+      profilePicture: '/example.com/profile4.jpg',
       score: 85,
     },
     {
-      profile_picture: '/example.com/profile5.jpg',
+      id: '5',
+      name: 'Techno Scribe',
       username: 'techno_scribe',
+      profilePicture: '/example.com/profile5.jpg',
       score: 82,
     },
     {
-      profile_picture: '/example.com/profile6.jpg',
+      id: '6',
+      name: 'Neon Shadow',
       username: 'neon_shadow',
+      profilePicture: '/example.com/profile6.jpg',
       score: 79,
     },
     {
-      profile_picture: '/example.com/profile7.jpg',
+      id: '7',
+      name: 'Binary Blade',
       username: 'binary_blade',
+      profilePicture: '/example.com/profile7.jpg',
       score: 75,
     },
     {
-      profile_picture: '/example.com/profile8.jpg',
+      id: '8',
+      name: 'Cosmic Whiz',
       username: 'cosmicWhiz',
+      profilePicture: '/example.com/profile8.jpg',
       score: 70,
     },
     {
-      profile_picture: '/example.com/profile9.jpg',
+      id: '9',
+      name: 'Data Surge',
       username: 'data_surge',
+      profilePicture: '/example.com/profile9.jpg',
       score: 65,
     },
     {
-      profile_picture: '/example.com/profile10.jpg',
+      id: '10',
+      name: 'Hacker Hero',
       username: 'hacker_hero',
+      profilePicture: '/example.com/profile10.jpg',
       score: 60,
     },
     {
-      profile_picture: 'idk',
+      id: '11',
+      name: 'Megatron',
       username: 'megatron',
+      profilePicture: 'idk',
       score: 58,
     },
   ]
 
   return (
-    <main className='flex flex-col flex-grow min-h-screen bg-background mb-16'>
-      <div className='flex flex-col min-h-[40vh] justify-between'>
-        <h1 className='text-center font-semibold text-2xl py-5'>Leaderboard</h1>
-        <div className='flex min-h-full justify-center items-end gap-4'>
-          {leaderboard.slice(0, 3).map((user, index) => (
-            <TopPlacementUser
-              key={user.username}
-              {...user}
-              top={index === 0 ? 'two' : index === 1 ? 'one' : undefined}
-              placement={index === 0 ? 2 : index === 1 ? 1 : 3}
+    <main className='flex flex-col flex-grow h-full bg-background w-full px-4 py-4 gap-4'>
+      <h1 className='text-xl'>Ranking</h1>
+      <div className='w-full'>
+        {leaderboard.map((user, index) => (
+          <div key={user.id}>
+            <UserCard
+              index={index + 1}
+              name={user.name}
+              username={user.username}
+              profilePicture={user.profilePicture}
+              score={user.score}
             />
-          ))}
-        </div>
-      </div>
-      <div className='flex flex-col gap-2 w-full bg-background rounded-t-3xl py-6 pb-8 px-5 flex-grow'>
-        {leaderboard.slice(3).map((user, i) => (
-          <NormalPlacementUser
-            key={user.username}
-            {...user}
-            placement={i + 3}
-          />
+            {index !== leaderboard.length - 1 && <Separator />}
+          </div>
         ))}
       </div>
     </main>
