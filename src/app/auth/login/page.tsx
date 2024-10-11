@@ -6,9 +6,6 @@ export default function LoginPage() {
       <h1 className='text-red-700 text-2xl font-semibold text-center'>
         spot.it
       </h1>
-      <p className='text-sm text-muted-foreground'>
-        Por favor, insira seus dados para entrar.
-      </p>
 
       <LoginForm />
 

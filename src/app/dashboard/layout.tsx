@@ -1,4 +1,4 @@
-import { UserMenu } from './_components/user-menu'
+import { Navbar } from './_components/navbar'
 
 export default function DashboardLayout({
   children,
@@ -6,9 +6,11 @@ export default function DashboardLayout({
   children: React.ReactNode
 }>) {
   return (
-    <>
-      {children}
-      <UserMenu />
-    </>
+    <div className='h-[calc(100dvh)] flex flex-col md:flex-row-reverse'>
+      <div className='flex-grow flex flex-col items-center justify-start gap-8 overflow-y-scroll'>
+        {children}
+      </div>
+      <Navbar />
+    </div>
   )
 }

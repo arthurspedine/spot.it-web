@@ -23,7 +23,7 @@ export function LoginForm() {
 
   function handleLogin(data: LoginSchema) {
     console.log(data)
-    router.push('/dashboard') // Redireciona para a página do dashboard
+    router.replace('/dashboard')
   }
 
   return (
@@ -31,7 +31,7 @@ export function LoginForm() {
       onSubmit={handleSubmit(handleLogin)}
       className='flex flex-col gap-3 w-4/5'
     >
-      <div>
+      <div className='space-y-1'>
         <Label htmlFor='user' className='font-bold text-sm'>
           Username ou Email
         </Label>
@@ -42,7 +42,7 @@ export function LoginForm() {
           {...register('identifier')}
         />
       </div>
-      <div>
+      <div className='space-y-1'>
         <Label htmlFor='password' className='font-bold text-sm'>
           Senha
         </Label>
