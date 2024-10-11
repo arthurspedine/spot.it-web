@@ -2,12 +2,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import {
   Sheet,
@@ -18,17 +12,26 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { getInitials } from '@/helpers/get-initials'
-import { Camera, Link, Search } from 'lucide-react'
+import { handleEncounter } from '@/http/handle-encounter'
+import { Camera, Search } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 interface WallyCardProps {
   id: string
   name: string
   profilePicture: string
-  score: number
+  encounters: number
 }
 
-export function WallyCard({ id, name, profilePicture, score }: WallyCardProps) {
+export function WallyCard({
+  id,
+  name,
+  profilePicture,
+  encounters,
+}: WallyCardProps) {
+  const router = useRouter()
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -41,8 +44,29 @@ export function WallyCard({ id, name, profilePicture, score }: WallyCardProps) {
   }
 
   const handleSendImage = () => {
+    if (!selectedImage) {
+      return toast.error('Nenhuma foto selecionada.')
+    }
+
+    const encounterData = new FormData()
+    encounterData.append('wallyId', id)
+    encounterData.append('encounterPicture', selectedImage)
+
+    const encounterRequest = handleEncounter(encounterData)
+
     setIsDialogOpen(false)
     setSelectedImage(null)
+
+    toast.promise(encounterRequest, {
+      loading: 'Agendando validação...',
+      success: () => {
+        router.refresh()
+        return 'Encontro registrado com sucesso.'
+      },
+      error: 'Algo deu errado ao registrar o encontro.',
+      position: 'top-center',
+      style: { filter: 'none', zIndex: 10 },
+    })
   }
 
   const handleCancel = () => {
@@ -62,7 +86,7 @@ export function WallyCard({ id, name, profilePicture, score }: WallyCardProps) {
           <h2>{name}</h2>
           <p className='flex gap-1.5 items-center ml-auto'>
             <Search className='size-4' />
-            <span>{score}</span>
+            <span>{encounters}</span>
           </p>
         </div>
 
