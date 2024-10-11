@@ -6,6 +6,7 @@ interface UserRank {
   id: string
   name: string
   username: string
+  profilePicture: string
   score: number
 }
 
@@ -35,7 +36,7 @@ export default async function Leaderboard() {
               index={index + 1}
               name={user.name}
               username={user.username}
-              profilePicture={''}
+              profilePicture={user.profilePicture}
               score={user.score}
             />
             {index !== leaderboard.length - 1 && <Separator />}
