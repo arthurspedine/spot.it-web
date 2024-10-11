@@ -6,6 +6,10 @@ import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import axios from 'axios'
+import { api } from '@/lib/axios'
+import { clientEnv } from '@/env'
+import { toast } from 'sonner'
 
 const signUpSchema = z.object({
   name: z
@@ -36,11 +40,10 @@ const signUpSchema = z.object({
       'A senha deve conter pelo menos um caractere especial.'
     ),
   profilePicture: z
-    .instanceof(File, { message: 'Selecione ao menos uma foto.' })
-    .array()
+    .custom<FileList>(file => file instanceof FileList && file.length > 0)
     .refine(
-      file => ['image/jpeg', 'image/png'].includes(file[0]?.type),
-      'Apenas imagens .jpg, .jpeg or .png são permitidas.'
+      file => ['image/jpeg', 'image/png'].includes(file[0].type),
+      'Apenas imagens .jpg, .jpeg ou .png são permitidas.'
     ),
 })
 
@@ -53,8 +56,25 @@ export function SignUpForm() {
     resolver: zodResolver(signUpSchema),
   })
 
-  function handleSignUp(data: SignUpSchema) {
-    console.log(data)
+  async function handleSignUp(data: SignUpSchema) {
+    const signUpForm = new FormData()
+    signUpForm.append('name', data.name)
+    signUpForm.append('username', data.username)
+    signUpForm.append('email', data.email)
+    signUpForm.append('password', data.password)
+    signUpForm.append('profilePicture', data.profilePicture[0]) // taking the only image from the FileList
+
+    const signUpRequest = api.post(
+      `${clientEnv.NEXT_PUBLIC_BACKEND_URL}/user/register`,
+      signUpForm
+    )
+    toast.promise(signUpRequest, {
+      loading: 'Cadastrando usuário...',
+      success: 'Usuário cadastrado com sucesso.',
+      error: 'Algo deu errado ao cadastrar o usuário.',
+      position: 'top-center',
+      style: { filter: 'none', zIndex: 10 },
+    })
   }
 
   return (
