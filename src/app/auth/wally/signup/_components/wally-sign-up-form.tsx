@@ -18,8 +18,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import Image from 'next/image'
-import imageCompression from 'browser-image-compression'
 
 const wallySignUpSchema = z.object({
   name: z
@@ -43,22 +41,11 @@ export function WallySignUpForm() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  async function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      try {
-        const options = {
-          maxSizeMB: 1,
-          maxWidthOrHeight: 300,
-          useWebWorker: true,
-        }
-
-        const compressedFile = await imageCompression(file, options)
-        setSelectedImage(compressedFile)
-        setIsDialogOpen(true)
-      } catch (error) {
-        toast.error('Algo deu errado ao comprimir a imagem.')
-      }
+      setSelectedImage(file)
+      setIsDialogOpen(true)
     }
   }
 
@@ -79,7 +66,7 @@ export function WallySignUpForm() {
     const signUpForm = new FormData()
     signUpForm.append('name', data.name)
     signUpForm.append('email', data.email)
-    signUpForm.append('profilePicture', selectedImage) // taking the only image from the FileList
+    signUpForm.append('profilePicture', selectedImage)
     signUpForm.append('role', data.role)
 
     const signUpRequest = api.post(

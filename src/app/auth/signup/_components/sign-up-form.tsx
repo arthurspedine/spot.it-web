@@ -3,13 +3,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@/components/ui/label'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import axios from 'axios'
 import { api } from '@/lib/axios'
 import { clientEnv } from '@/env'
 import { toast } from 'sonner'
+import { useState } from 'react'
 
 const signUpSchema = z.object({
   name: z
@@ -39,30 +38,34 @@ const signUpSchema = z.object({
       /[^A-Za-z0-9]/,
       'A senha deve conter pelo menos um caractere especial.'
     ),
-  profilePicture: z
-    .custom<FileList>(file => file instanceof FileList && file.length > 0)
-    .refine(
-      file => ['image/jpeg', 'image/png'].includes(file[0].type),
-      'Apenas imagens .jpg, .jpeg ou .png são permitidas.'
-    ),
 })
 
 type SignUpSchema = z.infer<typeof signUpSchema>
 
 export function SignUpForm() {
-  const router = useRouter()
-
   const { register, handleSubmit, formState } = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
   })
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setSelectedImage(file)
+    }
+  }
 
   async function handleSignUp(data: SignUpSchema) {
+    if (!selectedImage) {
+      return toast.error('Nenhuma foto selecionada.')
+    }
+
     const signUpForm = new FormData()
     signUpForm.append('name', data.name)
     signUpForm.append('username', data.username)
     signUpForm.append('email', data.email)
     signUpForm.append('password', data.password)
-    signUpForm.append('profilePicture', data.profilePicture[0]) // taking the only image from the FileList
+    signUpForm.append('profilePicture', selectedImage)
 
     const signUpRequest = api.post(
       `${clientEnv.NEXT_PUBLIC_BACKEND_URL}/user/register`,
@@ -149,16 +152,7 @@ export function SignUpForm() {
         <Label htmlFor='profilePicture' className='font-bold text-sm'>
           Foto de perfil
         </Label>
-        <Input
-          id='profilePicture'
-          type='file'
-          {...register('profilePicture')}
-        />
-        {formState.errors.profilePicture && (
-          <p className='text-destructive'>
-            {formState.errors.profilePicture.message}
-          </p>
-        )}
+        <Input id='profilePicture' type='file' onChange={handleImageChange} />
       </div>
 
       <Button size={'sm'} type='submit' className='bg-red-700 hover:bg-red-800'>
