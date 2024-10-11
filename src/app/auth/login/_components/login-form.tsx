@@ -1,8 +1,8 @@
-'use client' // Certifique-se de que este componente seja um componente do lado do cliente
+'use client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Label } from '@radix-ui/react-label'
+import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
