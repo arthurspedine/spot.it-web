@@ -42,7 +42,7 @@ export async function login(formData: LoginDataInput) {
 }
 
 export async function logout() {
-  cookies().set('access_token', '', { expires: new Date(0) })
+  cookies().set('access_token', '', { expires: new Date() })
 }
 
 export async function getSession() {
