@@ -29,9 +29,7 @@ export default async function middleware(req: NextRequest) {
     if (token) {
       const tokenData = await verifyJWT(token)
       if (tokenData) {
-        const redirectUrl: URL = req.nextUrl
-
-        return NextResponse.redirect(redirectUrl)
+        return NextResponse.next()
       }
     }
     const loginUrl = new URL('/auth/login', req.nextUrl)
@@ -44,10 +42,8 @@ export default async function middleware(req: NextRequest) {
     if (token) {
       const tokenData = await verifyJWT(token)
       if (tokenData) {
-        const { role } = tokenData
-
-        const redirectUrl: URL = req.nextUrl
-        return NextResponse.redirect(redirectUrl)
+        const dashboardUrl = new URL('/dashboard', req.nextUrl)
+        return NextResponse.redirect(dashboardUrl)
       }
     }
   }
