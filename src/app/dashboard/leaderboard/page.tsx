@@ -85,7 +85,7 @@ export default function Leaderboard() {
   ]
 
   return (
-    <main className='flex flex-col flex-grow h-full bg-background w-full px-4 py-4 gap-4'>
+    <main className='flex flex-col flex-grow h-full bg-background w-full p-4 gap-4'>
       <h1 className='text-xl'>Ranking</h1>
       <div className='w-full'>
         {leaderboard.map((user, index) => (

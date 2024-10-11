@@ -1,8 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import Image from 'next/image'
+import { Separator } from '@/components/ui/separator'
+import { getInitials } from '@/helpers/get-initials'
+import { Search } from 'lucide-react'
 
 type UserProfile = {
-  profile_picture: string
+  profilePicture: string
   name: string
   username: string
   email: string
@@ -10,65 +12,38 @@ type UserProfile = {
 }
 
 export default function Profile() {
-  const { profile_picture, name, username, email, score }: UserProfile = {
-    profile_picture: '',
+  const { profilePicture, name, username, email, score }: UserProfile = {
+    profilePicture: 'https://github.com/arthurspedine.png',
     name: 'Arthur Spedine',
     username: 'spedinearthur',
     email: 'spedinearthur@gmail.com',
-    score: 42,
+    score: 0,
   }
   return (
-    <main className='flex flex-col flex-grow min-h-screen'>
-      <h1 className='text-center font-semibold text-2xl py-5'>Profile</h1>
-      <div className='p-5 text-sm'>
-        <Avatar className='size-40 m-auto mb-4'>
-          <AvatarImage src={profile_picture} />
-          <AvatarFallback>AS</AvatarFallback>
+    <main className='flex flex-col flex-grow h-full gap-10 w-full p-4'>
+      <div className='flex'>
+        {/* Colocar botoes mais pra frente */}
+        <h1 className='font-semibold'>@{username}</h1>
+      </div>
+      <div className='flex justify-start items-center gap-8 px-4'>
+        <Avatar className='size-20'>
+          <AvatarImage src={profilePicture} />
+          <AvatarFallback>{getInitials(name)}</AvatarFallback>
         </Avatar>
-        <div>
-          <h2>{name}</h2>
-          <p className='text-xs text-muted-foreground'>@{username}</p>
-          <p>{email}</p>
-          <p>Pontos: {score}</p>
-
-          <div className='mt-4 flex flex-col gap-2'>
-            <h3 className='text-center text-xl'>Últimas capturas</h3>
-
-            <div className='flex flex-wrap items-center justify-center gap-2 w-full pb-20'>
-              <div className='bg-background flex py-3 items-center gap-4 rounded-xl px-4 border border-border w-64'>
-                <Avatar className='size-16'>
-                  <AvatarImage src={profile_picture} />
-                  <AvatarFallback>TE</AvatarFallback>
-                </Avatar>
-                <div className='flex flex-col gap-1 items-start'>
-                  <p className='font-medium'>Teste</p>
-                  <p className='text-xs flex'>Horário: 15:32:43</p>
-                </div>
-              </div>
-
-              <div className='bg-background flex py-3 items-center gap-4 rounded-xl px-4 border border-border w-64'>
-                <Avatar className='size-16'>
-                  <AvatarImage src={profile_picture} />
-                  <AvatarFallback>TE</AvatarFallback>
-                </Avatar>
-                <div className='flex flex-col gap-1 items-start'>
-                  <p className='font-medium'>Teste</p>
-                  <p className='text-xs flex'>Horário: 15:32:43</p>
-                </div>
-              </div>
-              <div className='bg-background flex py-3 items-center gap-4 rounded-xl px-4 border border-border w-64'>
-                <Avatar className='size-16'>
-                  <AvatarImage src={profile_picture} />
-                  <AvatarFallback>TE</AvatarFallback>
-                </Avatar>
-                <div className='flex flex-col gap-1 items-start'>
-                  <p className='font-medium'>Teste</p>
-                  <p className='text-xs flex'>Horário: 15:32:43</p>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className='flex flex-col gap-1'>
+          <h2 className='text-xl font-semibold'>{name}</h2>
+          <p className='text-sm text-muted-foreground'>{email}</p>
         </div>
+      </div>
+      <div className='pt-2 px-4 flex flex-col gap-2'>
+        <div className='flex justify-between'>
+          <h2 className='text-xl'>Encontros</h2>
+          <p className='flex gap-1.5 items-center ml-auto'>
+            <Search className='size-4' />
+            <span>{score}</span>
+          </p>
+        </div>
+        <Separator />
       </div>
     </main>
   )
