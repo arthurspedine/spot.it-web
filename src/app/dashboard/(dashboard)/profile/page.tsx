@@ -13,9 +13,11 @@ type UserProfile = {
   username: string
   email: string
   score: number
+  profilePicture: string
   encounters: {
     id: string
     occuredAt: string
+    encounterPicture: string
     wally: { id: string; name: string; role: string }
   }[]
 }
@@ -31,8 +33,14 @@ export default async function Profile() {
     },
   })
 
-  const { name, username, email, score, encounters }: UserProfile =
-    await data.json()
+  const {
+    name,
+    username,
+    email,
+    score,
+    encounters,
+    profilePicture,
+  }: UserProfile = await data.json()
 
   return (
     <main className='flex flex-col flex-grow h-full gap-10 w-full p-4'>
@@ -50,7 +58,7 @@ export default async function Profile() {
       </div>
       <div className='flex justify-start items-center gap-8 px-4'>
         <Avatar className='size-20'>
-          <AvatarImage src={''} />
+          <AvatarImage src={profilePicture} />
           <AvatarFallback>{getInitials(name)}</AvatarFallback>
         </Avatar>
         <div className='flex flex-col gap-1'>
@@ -67,15 +75,25 @@ export default async function Profile() {
           </p>
         </div>
         <Separator />
-        <div className='h-full flex flex-grow flex-col items-center justify-center'>
-          {encounters.length > 0 ? (
-            <p>Encontros encontrados!</p>
-          ) : (
+        {encounters.length > 0 ? (
+          <div className='columns-1 sm:columns-2 lg:columns-3 py-10 md:py-20 gap-4'>
+            {encounters.map(encounter => (
+              <div key={encounter.id} className='mb-4 break-inside-avoid'>
+                <img
+                  className='w-full object-cover rounded-lg'
+                  src={encounter.encounterPicture}
+                  alt={`Encontro com ${encounter.wally.name}`}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className='h-full flex flex-grow flex-col items-center justify-center'>
             <p className='text-muted-foreground text-sm'>
               Você ainda não encontrou ninguem...
             </p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </main>
   )
