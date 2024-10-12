@@ -6,6 +6,8 @@ import { LogOut, Search } from 'lucide-react'
 import { cookies } from 'next/headers'
 import { LogoutButton } from './_components/logout-button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { Sheet, SheetTrigger } from '@/components/ui/sheet'
+import { EncounterPicture } from './_components/encounter-picture'
 
 type UserProfile = {
   id: string
@@ -79,11 +81,20 @@ export default async function Profile() {
           <div className='columns-1 sm:columns-2 lg:columns-3 py-10 md:py-20 gap-4'>
             {encounters.map(encounter => (
               <div key={encounter.id} className='mb-4 break-inside-avoid'>
-                <img
-                  className='w-full object-cover rounded-lg'
-                  src={encounter.encounterPicture}
-                  alt={`Encontro com ${encounter.wally.name}`}
-                />
+                <Sheet>
+                  <SheetTrigger>
+                    <img
+                      className='w-full object-cover rounded-lg'
+                      src={encounter.encounterPicture}
+                      alt={`Encontro com ${encounter.wally.name}`}
+                    />
+                  </SheetTrigger>
+                  <EncounterPicture
+                    occuredAt={encounter.occuredAt}
+                    encounterPicture={encounter.encounterPicture}
+                    wallyName={encounter.wally.name}
+                  />
+                </Sheet>
               </div>
             ))}
           </div>
