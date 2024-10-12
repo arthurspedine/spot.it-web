@@ -73,7 +73,7 @@ export default async function Profile() {
           <h2 className='text-xl'>Encontros</h2>
           <p className='flex gap-1.5 items-center ml-auto'>
             <Search className='size-4' />
-            <span>{score}</span>
+            <span>{encounters.length}</span>
           </p>
         </div>
         <Separator />

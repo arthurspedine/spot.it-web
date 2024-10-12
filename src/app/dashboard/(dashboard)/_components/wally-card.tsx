@@ -58,7 +58,7 @@ export function WallyCard({
     setSelectedImage(null)
 
     toast.promise(encounterRequest, {
-      loading: 'Agendando validação...',
+      loading: 'Aguardando validação...',
       success: () => {
         router.refresh()
         return 'Encontro registrado com sucesso.'
