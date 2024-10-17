@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { api } from '@/lib/axios'
 import { clientEnv } from '@/env'
 import { toast } from 'sonner'
-import { useState } from 'react'
+import { use, useState } from 'react'
 import { Camera } from 'lucide-react'
 import {
   Sheet,
@@ -18,6 +18,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
+import { RoleList } from './role-list'
+
+export type RoleType = {
+  id: string
+  role: string
+  scoreMultiplier: string
+}
 
 const wallySignUpSchema = z.object({
   name: z
@@ -33,6 +41,12 @@ const wallySignUpSchema = z.object({
 
 type WallySignUpSchema = z.infer<typeof wallySignUpSchema>
 
+async function getRoleList(): Promise<RoleType[]> {
+  const roleListResponse = await api.get('/wally/role')
+
+  return roleListResponse.data
+}
+
 export function WallySignUpForm() {
   const { register, handleSubmit, formState } = useForm<WallySignUpSchema>({
     resolver: zodResolver(wallySignUpSchema),
@@ -40,6 +54,14 @@ export function WallySignUpForm() {
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true)
+  const [selectedRole, setSelectedRole] = useState<RoleType | null>(null)
+
+  // const [rolesList, setRolesList] = useState<RoleType[]>([])
+
+  const roleList = use(getRoleList())
+  console.log(roleList)
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -63,11 +85,15 @@ export function WallySignUpForm() {
       return toast.error('Nenhuma foto selecionada.')
     }
 
+    if (!selectedRole) {
+      return toast.error('Nenhuma role selecionada.')
+    }
+
     const signUpForm = new FormData()
     signUpForm.append('name', data.name)
     signUpForm.append('email', data.email)
     signUpForm.append('profilePicture', selectedImage)
-    signUpForm.append('role', data.role)
+    signUpForm.append('role', selectedRole.role)
 
     const signUpRequest = api.post(
       `${clientEnv.NEXT_PUBLIC_BACKEND_URL}/wally/register`,
@@ -145,7 +171,27 @@ export function WallySignUpForm() {
         <Label htmlFor='role' className='font-bold text-sm'>
           Cargo
         </Label>
-        <Input id='role' type='text' placeholder='Rare' {...register('role')} />
+        {/* <Input id='role' type='text' placeholder='Rare' {...register('role')} /> */}
+        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <DrawerTrigger asChild>
+            <Button
+              variant='outline'
+              className='w-[150px] justify-start'
+              onClick={() => setIsDrawerOpen(true)}
+            >
+              {selectedRole ? <>{selectedRole.role}</> : <>+ Set role</>}
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <div className='mt-4 border-t'>
+              <RoleList
+                roles={roleList}
+                setOpen={setIsDrawerOpen}
+                setSelectedRole={setSelectedRole}
+              />
+            </div>
+          </DrawerContent>
+        </Drawer>
         {formState.errors.role && (
           <p className='text-destructive'>{formState.errors.role.message}</p>
         )}
