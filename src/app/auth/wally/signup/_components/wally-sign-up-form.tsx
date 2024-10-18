@@ -154,7 +154,7 @@ export function WallySignUpForm() {
     const blob = dataURLToBlob(dataUrl)
 
     const file = new File([blob], 'user.jpg', {
-      type: 'image/jpeg',
+      type: 'image/*',
     })
     setSelectedImage(file)
   }
