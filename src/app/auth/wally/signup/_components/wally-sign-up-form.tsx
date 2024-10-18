@@ -167,18 +167,19 @@ export function WallySignUpForm() {
       })
     }
 
-    if (!selectedRole) {
-      return toast.error('Nenhum cargo selecionado.', {
-        position: 'top-center',
-        style: { filter: 'none', zIndex: 10 },
-      })
-    }
+    // if (!selectedRole) {
+    //   return toast.error('Nenhum cargo selecionado.', {
+    //     position: 'top-center',
+    //     style: { filter: 'none', zIndex: 10 },
+    //   })
+    // }
 
     const signUpForm = new FormData()
     signUpForm.append('name', data.name)
     signUpForm.append('email', data.email)
     signUpForm.append('profilePicture', selectedImage)
-    signUpForm.append('role', selectedRole.role)
+    // signUpForm.append('role', selectedRole.role)
+    signUpForm.append('role', 'Comum')
 
     const signUpRequest = api.post(
       `${clientEnv.NEXT_PUBLIC_BACKEND_URL}/wally/register`,
