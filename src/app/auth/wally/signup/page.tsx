@@ -1,4 +1,4 @@
-import { WallySignUpForm } from "./_components/wally-sign-up-form";
+import { WallySignUpForm } from './_components/wally-sign-up-form'
 
 export default function WallySignUpPage() {
   return (

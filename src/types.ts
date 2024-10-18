@@ -17,4 +17,10 @@ export const loginSchema = z.object({
   password: z.string(),
 })
 
+export type WallyRole = {
+  id: string
+  role: string
+  scoreMultiplier: number
+}
+
 export type LoginDataInput = z.infer<typeof loginSchema>

@@ -1,15 +1,9 @@
 'use client'
+
 import { Button } from '@/components/ui/button'
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@/components/ui/label'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { api } from '@/lib/axios'
-import { clientEnv } from '@/env'
-import { toast } from 'sonner'
-import { useState } from 'react'
-import { Camera } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -18,6 +12,17 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { clientEnv } from '@/env'
+import { api } from '@/lib/axios'
+import type { WallyRole } from '@/types'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Camera, UserCog } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+import { getRoleColor } from './get-role-color'
+import { RoleList } from './role-list'
 
 const wallySignUpSchema = z.object({
   name: z
@@ -28,10 +33,18 @@ const wallySignUpSchema = z.object({
     .string()
     .email('Formato de email inválido.')
     .max(100, 'O email deve ter no máximo 100 caracteres.'),
-  role: z.string().min(3, 'O cargo deve ter ao menos 3 caracteres.'),
 })
 
 type WallySignUpSchema = z.infer<typeof wallySignUpSchema>
+
+async function getWallyRoles(): Promise<WallyRole[]> {
+  const rolesResponse = await fetch(
+    `${clientEnv.NEXT_PUBLIC_BACKEND_URL}/wally/role`
+  )
+  const data = await rolesResponse.json()
+
+  return data
+}
 
 export function WallySignUpForm() {
   const { register, handleSubmit, formState } = useForm<WallySignUpSchema>({
@@ -40,6 +53,14 @@ export function WallySignUpForm() {
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  const [roles, setRoles] = useState<WallyRole[]>([])
+  const [isRoleSelectionOpen, setIsRoleSelectionOpen] = useState(false)
+  const [selectedRole, setSelectedRole] = useState<WallyRole | null>()
+
+  useEffect(() => {
+    getWallyRoles().then(setRoles)
+  }, [])
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -60,14 +81,24 @@ export function WallySignUpForm() {
 
   async function handleSignUp(data: WallySignUpSchema) {
     if (!selectedImage) {
-      return toast.error('Nenhuma foto selecionada.')
+      return toast.error('Nenhuma foto selecionada.', {
+        position: 'top-center',
+        style: { filter: 'none', zIndex: 10 },
+      })
+    }
+
+    if (!selectedRole) {
+      return toast.error('Nenhum cargo selecionado.', {
+        position: 'top-center',
+        style: { filter: 'none', zIndex: 10 },
+      })
     }
 
     const signUpForm = new FormData()
     signUpForm.append('name', data.name)
     signUpForm.append('email', data.email)
     signUpForm.append('profilePicture', selectedImage)
-    signUpForm.append('role', data.role)
+    signUpForm.append('role', selectedRole.role)
 
     const signUpRequest = api.post(
       `${clientEnv.NEXT_PUBLIC_BACKEND_URL}/wally/register`,
@@ -141,14 +172,44 @@ export function WallySignUpForm() {
         </Button>
       </div>
 
-      <div className='space-y-1'>
+      <div className='flex flex-col gap-1'>
         <Label htmlFor='role' className='font-bold text-sm'>
           Cargo
         </Label>
-        <Input id='role' type='text' placeholder='Rare' {...register('role')} />
-        {formState.errors.role && (
-          <p className='text-destructive'>{formState.errors.role.message}</p>
-        )}
+        <Drawer
+          open={isRoleSelectionOpen}
+          onOpenChange={setIsRoleSelectionOpen}
+        >
+          <DrawerTrigger asChild>
+            <Button
+              variant='outline'
+              className='w-full justify-start py-5 px-2'
+            >
+              {selectedRole ? (
+                <div className='flex justify-between w-full items-center'>
+                  <span>{selectedRole.role}</span>
+                  <span
+                    className={`${getRoleColor(selectedRole.id)} px-2 py-1 rounded-md font-semibold`}
+                  >
+                    {selectedRole.scoreMultiplier}
+                  </span>
+                </div>
+              ) : (
+                <div className='flex gap-2 items-center text-muted-foreground'>
+                  <UserCog className='size-6' />
+                  <span>Adicionar cargo</span>
+                </div>
+              )}
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <RoleList
+              roles={roles}
+              setOpen={setIsRoleSelectionOpen}
+              setSelectedRole={setSelectedRole}
+            />
+          </DrawerContent>
+        </Drawer>
       </div>
 
       <Sheet open={isDialogOpen} onOpenChange={setIsDialogOpen}>
