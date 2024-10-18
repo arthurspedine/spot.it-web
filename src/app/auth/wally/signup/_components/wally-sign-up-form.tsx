@@ -34,7 +34,7 @@ import { setCanvasPreview } from '../../../../../helpers/set-canvas-preview'
 import { dataURLToBlob } from '@/helpers/data-url-to-blob'
 
 const ASPECT_RATIO = 1
-const MIN_DIMENTION = 150
+const MIN_DIMENTION = 200
 
 const wallySignUpSchema = z.object({
   name: z
@@ -96,7 +96,7 @@ export function WallySignUpForm() {
         if (naturalWidth < MIN_DIMENTION || naturalHeight < MIN_DIMENTION) {
           setSelectedImage(null)
           setIsDialogOpen(false)
-          return toast.error('Imagem deve ser ao menos 150x150.')
+          return toast.error('Imagem deve ser ao menos 200x200.')
         }
       })
       setSelectedImage(imgUrl)
@@ -147,7 +147,7 @@ export function WallySignUpForm() {
     setCanvasPreview(
       imgRef.current,
       canvasRef.current,
-      convertToPixelCrop(crop, imgRef.current.width, imgRef.current.height)
+      convertToPixelCrop(crop, width, height)
     )
     const dataUrl = canvasRef.current.toDataURL()
 
@@ -287,7 +287,7 @@ export function WallySignUpForm() {
             </SheetDescription>
           </SheetHeader>
           {selectedImage && (
-            <div className='flex justify-center'>
+            <div className='flex flex-col justify-center'>
               <ReactCrop
                 crop={crop}
                 onChange={(pixelCrop, percentCrop) => {
@@ -322,8 +322,8 @@ export function WallySignUpForm() {
                     display: 'none',
                     border: '1px solid black',
                     objectFit: 'contain',
-                    width: '150px',
-                    height: '150px',
+                    width: '200px',
+                    height: '200px',
                   }}
                 />
               )}

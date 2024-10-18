@@ -29,7 +29,7 @@ import { dataURLToBlob } from '@/helpers/data-url-to-blob'
 import { setCanvasPreview } from '@/helpers/set-canvas-preview'
 
 const ASPECT_RATIO = 1
-const MIN_DIMENTION = 150
+const MIN_DIMENTION = 200
 
 const signUpSchema = z.object({
   name: z
@@ -93,7 +93,7 @@ export function SignUpForm() {
         if (naturalWidth < MIN_DIMENTION || naturalHeight < MIN_DIMENTION) {
           setSelectedImage(null)
           setIsDialogOpen(false)
-          return toast.error('Imagem deve ser ao menos 150x150.')
+          return toast.error('Imagem deve ser ao menos 200x200.')
         }
       })
       setSelectedImage(imgUrl)
@@ -302,8 +302,8 @@ export function SignUpForm() {
                     display: 'none',
                     border: '1px solid black',
                     objectFit: 'contain',
-                    width: '150px',
-                    height: '150px',
+                    width: '200px',
+                    height: '200px',
                   }}
                 />
               )}
