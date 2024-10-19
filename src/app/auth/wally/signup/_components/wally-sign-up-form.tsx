@@ -17,11 +17,25 @@ import { api } from '@/lib/axios'
 import type { WallyRole } from '@/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Camera, UserCog } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import {
+  type ChangeEvent,
+  type SyntheticEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { useForm } from 'react-hook-form'
+import ReactCrop, {
+  centerCrop,
+  convertToPixelCrop,
+  makeAspectCrop,
+  type Crop,
+} from 'react-image-crop'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { getRoleColor } from './get-role-color'
+import { dataURLToBlob, setImageCrop } from './image-crop'
+import { resizeImage } from './resize-img'
 import { RoleList } from './role-list'
 
 const wallySignUpSchema = z.object({
@@ -46,11 +60,24 @@ async function getWallyRoles(): Promise<WallyRole[]> {
   return data
 }
 
+const ASPECT_RATIO = 1
+const MIN_DIMENSION = 150
+
 export function WallySignUpForm() {
   const { register, handleSubmit, formState } = useForm<WallySignUpSchema>({
     resolver: zodResolver(wallySignUpSchema),
   })
 
+  const imgRef = useRef<HTMLImageElement | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const [crop, setCrop] = useState<Crop>({
+    unit: '%',
+    x: 25,
+    y: 25,
+    width: 50,
+    height: 50,
+  })
+  const [uploadedImgSrc, setUploadedImgSrc] = useState('')
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -58,25 +85,103 @@ export function WallySignUpForm() {
   const [isRoleSelectionOpen, setIsRoleSelectionOpen] = useState(false)
   const [selectedRole, setSelectedRole] = useState<WallyRole | null>()
 
+  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.addEventListener('load', () => {
+      const imageElement = new Image()
+      const imageUrl = reader.result?.toString() || ''
+      imageElement.src = imageUrl
+
+      imageElement.addEventListener('load', event => {
+        const { naturalWidth, naturalHeight } =
+          event.currentTarget as HTMLImageElement
+
+        if (naturalHeight < MIN_DIMENSION || naturalWidth < MIN_DIMENSION) {
+          toast.error('A imagem deve ser pelo menos 150x150', {
+            position: 'top-center',
+            style: { filter: 'none', zIndex: 10 },
+          })
+          return setUploadedImgSrc('')
+        }
+
+        setUploadedImgSrc(imageUrl)
+        setIsDialogOpen(true)
+      })
+    })
+
+    reader.readAsDataURL(file)
+  }
+
+  function onImageLoad(event: SyntheticEvent<HTMLImageElement>) {
+    const { width, height } = event.currentTarget
+    const cropWidthInPercent = (MIN_DIMENSION / width) * 100
+
+    const crop = makeAspectCrop(
+      {
+        unit: '%',
+        width: cropWidthInPercent,
+      },
+      ASPECT_RATIO,
+      width,
+      height
+    )
+    const centeredCrop = centerCrop(crop, width, height)
+    setCrop(centeredCrop)
+  }
+
+  async function handleImageConfirmation() {
+    if (!imgRef.current || !canvasRef.current) {
+      return toast.error('Algo deu errado ao recortar a imagem', {
+        position: 'top-center',
+        style: { filter: 'none', zIndex: 10 },
+      })
+    }
+
+    setImageCrop(
+      imgRef.current,
+      canvasRef.current,
+      convertToPixelCrop(crop, imgRef.current.width, imgRef.current.height)
+    )
+
+    const dataUrl = canvasRef.current.toDataURL()
+    const dataBlob = dataURLToBlob(dataUrl)
+    const rawFile = new File([dataBlob], 'user.png', {
+      type: 'image/*',
+    })
+
+    try {
+      const resizedBlob = await resizeImage(
+        rawFile,
+        512,
+        512,
+        0.8
+      )
+      if (resizedBlob) {
+        const resizedFile = new File([resizedBlob], rawFile.name, {
+          type: rawFile.type,
+        })
+        setSelectedImage(resizedFile)
+      }
+    } catch (error) {
+      toast.error('Erro ao redimensionar a imagem.', {
+        position: 'top-center',
+        style: { filter: 'none', zIndex: 10 },
+      })
+    }
+
+    setIsDialogOpen(false)
+  }
+
   useEffect(() => {
     getWallyRoles().then(setRoles)
   }, [])
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      setSelectedImage(file)
-      setIsDialogOpen(true)
-    }
-  }
-
   const handleCancel = () => {
     setIsDialogOpen(false)
     setSelectedImage(null)
-  }
-
-  const handleConfirmImage = () => {
-    setIsDialogOpen(false)
   }
 
   async function handleSignUp(data: WallySignUpSchema) {
@@ -163,8 +268,9 @@ export function WallySignUpForm() {
               className='absolute inset-0 opacity-0 cursor-pointer'
               onChange={handleImageChange}
             />
-            {selectedImage ? (
-              <div>{selectedImage.name}</div>
+            {uploadedImgSrc ? (
+              // Modificar para pegar realmente a imagem do usuario
+              <div>Foto selecionada.</div>
             ) : (
               <Camera className='size-6' />
             )}
@@ -222,11 +328,35 @@ export function WallySignUpForm() {
               Tem certeza de que deseja enviar essa imagem?
             </SheetDescription>
           </SheetHeader>
-          {selectedImage && (
-            <img
-              src={URL.createObjectURL(selectedImage)}
-              alt='Pré-visualização da imagem'
-              className='w-full rounded-lg'
+          {uploadedImgSrc && (
+            <ReactCrop
+              crop={crop}
+              onChange={(pixelCrop, percentCrop) => {
+                setCrop(percentCrop)
+              }}
+              circularCrop
+              keepSelection
+              aspect={ASPECT_RATIO}
+              minWidth={MIN_DIMENSION}
+            >
+              <img
+                ref={imgRef}
+                src={uploadedImgSrc}
+                alt='Pré-visualização da imagem'
+                className='w-full rounded-lg'
+                onLoad={onImageLoad}
+              />
+            </ReactCrop>
+          )}
+          {crop && (
+            <canvas
+              ref={canvasRef}
+              className='hidden'
+              style={{
+                objectFit: 'contain',
+                width: 150,
+                height: 150,
+              }}
             />
           )}
           <SheetFooter>
@@ -238,7 +368,10 @@ export function WallySignUpForm() {
               >
                 Cancelar
               </Button>
-              <Button className='w-full' onClick={handleConfirmImage}>
+              <Button
+                className='w-full'
+                onClick={() => handleImageConfirmation()}
+              >
                 Enviar
               </Button>
             </div>
