@@ -13,7 +13,8 @@ import {
 } from '@/components/ui/sheet'
 import { getInitials } from '@/helpers/get-initials'
 import { handleEncounter } from '@/http/handle-encounter'
-import { Camera, Search } from 'lucide-react'
+import clsx from 'clsx'
+import { Camera, Check, Search, UserRoundCheck, UserRoundCog } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -23,6 +24,7 @@ interface WallyCardProps {
   name: string
   profilePicture: string
   encounters: number
+  hasEncountered: boolean
 }
 
 export function WallyCard({
@@ -30,6 +32,7 @@ export function WallyCard({
   name,
   profilePicture,
   encounters,
+  hasEncountered,
 }: WallyCardProps) {
   const router = useRouter()
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
@@ -90,18 +93,22 @@ export function WallyCard({
           </p>
         </div>
 
-        <Button asChild className='ml-auto'>
-          <div className='relative'>
-            <Input
-              type='file'
-              accept='image/*'
-              capture='environment'
-              className='absolute inset-0 opacity-0 cursor-pointer'
-              onChange={handleImageChange}
-            />
-            <Camera className='size-6' />
-          </div>
-        </Button>
+        {hasEncountered ? (
+          <Check className='size-7 ml-auto' />
+        ) : (
+          <Button asChild className='ml-auto'>
+            <div className='relative'>
+              <Input
+                type='file'
+                accept='image/*'
+                capture='environment'
+                className='absolute inset-0 opacity-0 cursor-pointer'
+                onChange={handleImageChange}
+              />
+              <Camera className='size-6' />
+            </div>
+          </Button>
+        )}
       </div>
 
       <Sheet open={isDialogOpen} onOpenChange={setIsDialogOpen}>

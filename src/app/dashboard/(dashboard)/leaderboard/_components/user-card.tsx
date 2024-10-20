@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitials } from '@/helpers/get-initials'
-import { Coins, Star } from 'lucide-react'
+import { Coins } from 'lucide-react'
 
 interface UserCardProps {
   index: number

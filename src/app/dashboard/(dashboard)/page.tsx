@@ -6,6 +6,7 @@ interface Wally {
   name: string
   profilePicture: string
   encounters: number
+  hasEncountered: boolean
 }
 
 export default async function Dashboard() {
@@ -36,6 +37,7 @@ export default async function Dashboard() {
               name={wally.name}
               profilePicture={wally.profilePicture}
               encounters={wally.encounters}
+              hasEncountered={wally.hasEncountered}
             />
           ))}
         </div>
