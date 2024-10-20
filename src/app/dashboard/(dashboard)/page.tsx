@@ -4,6 +4,10 @@ import { cookies } from 'next/headers'
 interface Wally {
   id: string
   name: string
+  role: {
+    name: string,
+    scoreMultiplier: number
+  }
   profilePicture: string
   encounters: number
   hasEncountered: boolean
@@ -38,6 +42,7 @@ export default async function Dashboard() {
               profilePicture={wally.profilePicture}
               encounters={wally.encounters}
               hasEncountered={wally.hasEncountered}
+              role={wally.role}
             />
           ))}
         </div>

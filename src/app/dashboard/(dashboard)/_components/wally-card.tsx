@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getRoleColor } from '@/app/auth/wally/signup/_components/get-role-color'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -13,8 +13,9 @@ import {
 } from '@/components/ui/sheet'
 import { getInitials } from '@/helpers/get-initials'
 import { handleEncounter } from '@/http/handle-encounter'
+import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import clsx from 'clsx'
-import { Camera, Check, Search, UserRoundCheck, UserRoundCog } from 'lucide-react'
+import { Camera, Check, Search, User, UserRound } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -25,6 +26,10 @@ interface WallyCardProps {
   profilePicture: string
   encounters: number
   hasEncountered: boolean
+  role: {
+    name: string
+    scoreMultiplier: number
+  }
 }
 
 export function WallyCard({
@@ -33,6 +38,7 @@ export function WallyCard({
   profilePicture,
   encounters,
   hasEncountered,
+  role,
 }: WallyCardProps) {
   const router = useRouter()
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
@@ -79,38 +85,62 @@ export function WallyCard({
 
   return (
     <div className='w-full px-2 py-4'>
-      <div className='flex items-center gap-4'>
-        <Avatar className='size-16 border border-primary'>
-          <AvatarImage src={profilePicture} />
-          <AvatarFallback>{getInitials(name)}</AvatarFallback>
-        </Avatar>
-
-        <div className='gap-2.5'>
-          <h2>{name}</h2>
-          <p className='flex gap-1.5 items-center ml-auto'>
-            <Search className='size-4' />
-            <span>{encounters}</span>
-          </p>
-        </div>
-
-        {hasEncountered ? (
-          <Check className='size-7 ml-auto' />
-        ) : (
-          <Button asChild className='ml-auto'>
-            <div className='relative'>
-              <Input
-                type='file'
-                accept='image/*'
-                capture='environment'
-                className='absolute inset-0 opacity-0 cursor-pointer'
-                onChange={handleImageChange}
-              />
-              <Camera className='size-6' />
-            </div>
-          </Button>
+      <div
+        className={clsx(
+          'flex gap-4 bg-card border rounded-md overflow-hidden',
+          {
+            'border-amber-700': encounters === 0,
+            'border-border': encounters > 0,
+          }
         )}
+      >
+        <div className='relative w-32'>
+          <Avatar>
+            <AvatarImage src={profilePicture} />
+            <AvatarFallback>{getInitials(name)}</AvatarFallback>
+            <span
+              className={clsx(
+                'text-sm bg-border absolute px-2 rounded-tr-lg font-semibold left-0 bottom-0',
+                {
+                  'bg-amber-700': encounters === 0,
+                }
+              )}
+            >
+              x {role.scoreMultiplier * (encounters === 0 ? 2 : 1)}
+            </span>
+          </Avatar>
+        </div>
+        <div className='py-2 pr-2 flex-grow flex flex-col justify-between'>
+          <div className='space-y-0.5'>
+            <h2 className='break-words text-lg font-semibold'>{name}</h2>
+            <p className='flex gap-1.5 items-center text-muted-foreground'>
+              <span>{role.name}</span>
+            </p>
+          </div>
+          <div className='flex'>
+            <p className='flex gap-1.5 items-center text-muted-foreground'>
+              <Search className='size-4' />
+              <span>{`${encounters} ${encounters === 1 ? 'vez' : 'vezes'}`}</span>
+            </p>
+            {hasEncountered ? (
+              <Check className='size-7 ml-auto mr-2' />
+            ) : (
+              <Button asChild className='ml-auto'>
+                <div className='relative'>
+                  <Input
+                    type='file'
+                    accept='image/*'
+                    capture='environment'
+                    className='absolute inset-0 opacity-0 cursor-pointer'
+                    onChange={handleImageChange}
+                  />
+                  <Camera className='size-6' />
+                </div>
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
-
       <Sheet open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <SheetContent side={'bottom'} className='flex flex-col gap-4'>
           <SheetHeader>
