@@ -1,6 +1,5 @@
 'use client'
 
-import { getRoleColor } from '@/app/auth/wally/signup/_components/get-role-color'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -15,7 +14,7 @@ import { getInitials } from '@/helpers/get-initials'
 import { handleEncounter } from '@/http/handle-encounter'
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import clsx from 'clsx'
-import { Camera, Check, Search, User, UserRound } from 'lucide-react'
+import { Camera, Check, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -84,7 +83,7 @@ export function WallyCard({
   }
 
   return (
-    <div className='w-full px-2 py-4'>
+    <div className='w-full py-4'>
       <div
         className={clsx(
           'flex gap-4 bg-card border rounded-md overflow-hidden',
@@ -100,9 +99,10 @@ export function WallyCard({
             <AvatarFallback>{getInitials(name)}</AvatarFallback>
             <span
               className={clsx(
-                'text-sm bg-border absolute px-2 rounded-tr-lg font-semibold left-0 bottom-0',
+                'text-sm absolute px-2 rounded-tr-lg font-semibold left-0 bottom-0',
                 {
                   'bg-amber-700': encounters === 0,
+                  'bg-border': encounters > 0,
                 }
               )}
             >

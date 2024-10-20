@@ -1,11 +1,11 @@
-import { WallyCard } from './_components/wally-card'
 import { cookies } from 'next/headers'
+import { WalliesContainer } from './_components/wallies-container'
 
 interface Wally {
   id: string
   name: string
   role: {
-    name: string,
+    name: string
     scoreMultiplier: number
   }
   profilePicture: string
@@ -33,19 +33,7 @@ export default async function Dashboard() {
     <main className='flex-grow w-full p-4 overflow-x-hidden h-full'>
       <h1 className='text-xl font-bold'>Perdidos</h1>
       {wallies.length ? (
-        <div className='w-full'>
-          {wallies.map(wally => (
-            <WallyCard
-              key={wally.id}
-              id={wally.id}
-              name={wally.name}
-              profilePicture={wally.profilePicture}
-              encounters={wally.encounters}
-              hasEncountered={wally.hasEncountered}
-              role={wally.role}
-            />
-          ))}
-        </div>
+        <WalliesContainer wallies={wallies} />
       ) : (
         <div className='h-full flex flex-col justify-center items-center'>
           <p className='text-muted-foreground text-center justify-items-center'>
