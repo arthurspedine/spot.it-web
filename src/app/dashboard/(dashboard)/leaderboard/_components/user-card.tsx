@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitials } from '@/helpers/get-initials'
-import { Search } from 'lucide-react'
+import { Coins, Star } from 'lucide-react'
 
 interface UserCardProps {
   index: number
@@ -32,8 +32,8 @@ export function UserCard({
         </div>
       </div>
       <p className='flex gap-1.5 items-center ml-auto'>
-        <Search className='size-4' />
         <span>{score}</span>
+        <Coins className='size-6' />
       </p>
     </div>
   )
