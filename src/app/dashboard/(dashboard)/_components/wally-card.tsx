@@ -14,7 +14,7 @@ import { getInitials } from '@/helpers/get-initials'
 import { handleEncounter } from '@/http/handle-encounter'
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import clsx from 'clsx'
-import { Camera, Check, Search } from 'lucide-react'
+import { Camera, Check, LoaderPinwheel, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -40,6 +40,8 @@ export function WallyCard({
   role,
 }: WallyCardProps) {
   const router = useRouter()
+
+  const [isEncountering, setIsEncountering] = useState(false)
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -64,6 +66,7 @@ export function WallyCard({
 
     setIsDialogOpen(false)
     setSelectedImage(null)
+    setIsEncountering(true)
 
     toast.promise(encounterRequest, {
       loading: 'Aguardando validação...',
@@ -71,7 +74,10 @@ export function WallyCard({
         router.refresh()
         return 'Encontro registrado com sucesso.'
       },
-      error: 'Algo deu errado ao registrar o encontro.',
+      error: () => {
+        setIsEncountering(false)
+        return 'Algo deu errado ao registrar o encontro.'
+      },
       position: 'top-center',
       style: { filter: 'none', zIndex: 10 },
     })
@@ -125,17 +131,25 @@ export function WallyCard({
             {hasEncountered ? (
               <Check className='size-7 ml-auto mr-2' />
             ) : (
-              <Button asChild className='ml-auto'>
-                <div className='relative'>
-                  <Input
-                    type='file'
-                    accept='image/*'
-                    capture='environment'
-                    className='absolute inset-0 opacity-0 cursor-pointer'
-                    onChange={handleImageChange}
-                  />
-                  <Camera className='size-6' />
-                </div>
+              <Button
+                asChild={!isEncountering}
+                disabled={isEncountering}
+                className='ml-auto'
+              >
+                {isEncountering ? (
+                  <LoaderPinwheel className='size-6 animate-spin' />
+                ) : (
+                  <div className='relative'>
+                    <Input
+                      type='file'
+                      accept='image/*'
+                      capture='environment'
+                      className='absolute inset-0 opacity-0 cursor-pointer'
+                      onChange={handleImageChange}
+                    />
+                    <Camera className='size-6' />
+                  </div>
+                )}
               </Button>
             )}
           </div>
