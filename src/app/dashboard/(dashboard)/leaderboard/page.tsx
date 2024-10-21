@@ -28,7 +28,7 @@ export default async function Leaderboard() {
 
   return (
     <main className='flex flex-col flex-grow h-full bg-background w-full px-4 py-4 gap-4'>
-      <h1 className='text-xl'>Ranking</h1>
+      <h1 className='text-xl font-semibold'>Ranking</h1>
       <div className='w-full'>
         {leaderboard.map((user, index) => (
           <div key={user.id}>

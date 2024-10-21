@@ -31,7 +31,7 @@ export default async function Dashboard() {
 
   return (
     <main className='flex-grow w-full p-4 overflow-x-hidden h-full'>
-      <h1 className='text-xl font-bold'>Perdidos</h1>
+      <h1 className='text-xl font-semibold'>Perdidos</h1>
       {wallies.length ? (
         <WalliesContainer wallies={wallies} />
       ) : (
