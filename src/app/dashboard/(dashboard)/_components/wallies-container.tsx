@@ -1,9 +1,9 @@
 'use client'
 
+import { SearchInput } from '@/components/ui/search-input'
 import { Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { WallyCard } from './wally-card'
-import { SearchInput } from '@/components/ui/search-input'
 
 interface Wally {
   id: string
@@ -22,7 +22,11 @@ export function WalliesContainer({ wallies }: { wallies: Wally[] }) {
   const [search, setSearch] = useState('')
 
   useEffect(() => {
-    setFilteredWallies(wallies.filter(wally => wally.name.includes(search)))
+    setFilteredWallies(
+      wallies.filter(wally =>
+        wally.name.toLowerCase().includes(search.toLowerCase())
+      )
+    )
   }, [search, wallies])
 
   return (
